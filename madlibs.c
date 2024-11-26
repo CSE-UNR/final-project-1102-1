@@ -49,18 +49,20 @@ int main(){
 }
 
 void scanFile(FILE* userFilePTR, char nouns[][STR_CAP], int* nounIndex, char verbs[NUM_VERBS][STR_CAP], int* verbIndex, char adjectives[NUM_ADJECTIVES][STR_CAP], int* adjectiveIndex){
-	char scannedCharacter;
-	while(fscanf(userFilePTR, "%c", &scannedCharacter) == 1){
-		switch(scannedCharacter){
-			case 'A':
-				adjectiveInput(adjectives, adjectiveIndex);
-				break;
-			case 'N':
-				nounInput(nouns, nounIndex);
-				break;
-			case 'V':
-				verbInput(verbs, verbIndex);
-				break;	
+	char scannedCharacter[STR_CAP];
+	while(fgets(scannedCharacter, STR_CAP, userFilePTR) != NULL){
+		if(stringLength(scannedCharacter) == 2){
+			switch(scannedCharacter[0]){
+				case 'A':
+					adjectiveInput(adjectives, adjectiveIndex);
+					break;
+				case 'N':
+					nounInput(nouns, nounIndex);
+					break;
+				case 'V':
+					verbInput(verbs, verbIndex);
+					break;	
+			}
 		}
 	}
 	
@@ -92,23 +94,27 @@ void adjectiveInput(char adjectives[][STR_CAP], int* adjectiveIndex){
 
 
 void printWords(FILE* userFilePTR, char nouns[][STR_CAP], int* nounIndex, char verbs[NUM_VERBS][STR_CAP], int* verbIndex, char adjectives[NUM_ADJECTIVES][STR_CAP], int* adjectiveIndex){
-	char scannedCharacter;
-	while(fscanf(userFilePTR, "%c", &scannedCharacter) == 1){
-		if(scannedCharacter != '\n'){
-			if(scannedCharacter == 'A'){
+	char scannedCharacter[STR_CAP];
+	int size = 0;
+	while(fgets(scannedCharacter, STR_CAP, userFilePTR) != NULL){
+		if(stringLength(scannedCharacter) == 2 ){
+			if(scannedCharacter[0] == 'A'){
 				printf("%s", adjectives[*adjectiveIndex]);
 				(*adjectiveIndex)++;
-			} else if(scannedCharacter == 'N'){
+			} else if(scannedCharacter[0] == 'N'){
 				printf("%s" , nouns[*nounIndex]);
 				(*nounIndex)++;
-			} else if(scannedCharacter == 'V'){
+			} else if(scannedCharacter[0] == 'V'){
 				printf("%s", verbs[*verbIndex]);
 				(*verbIndex)++;
 			}
-		 	else{
-				printf("%c", scannedCharacter);
-			}
 		}
+		else{
+		 	size = stringLength(scannedCharacter);
+		 	scannedCharacter[size - 1] = '\0';
+			printf("%s", scannedCharacter);
+		}
+		
 		
 	}
 	printf("\n");
