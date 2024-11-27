@@ -17,6 +17,7 @@ void adjectiveInput(char adjectives[][STR_CAP], int* adjectiveIndex);
 
 void printWords(FILE* userFilePTR, char nouns[][STR_CAP], int* nounIndex, char verbs[NUM_VERBS][STR_CAP], int* verbIndex, char adjectives[NUM_ADJECTIVES][STR_CAP], int* adjectiveIndex);
 int stringLength(char str[]);
+void stringCopy(char[], char[]);
 
 int main(){
 	char userFile[USERFILESIZE];
@@ -49,10 +50,10 @@ int main(){
 }
 
 void scanFile(FILE* userFilePTR, char nouns[][STR_CAP], int* nounIndex, char verbs[NUM_VERBS][STR_CAP], int* verbIndex, char adjectives[NUM_ADJECTIVES][STR_CAP], int* adjectiveIndex){
-	char scannedCharacter[STR_CAP];
-	while(fgets(scannedCharacter, STR_CAP, userFilePTR) != NULL){
-		if(stringLength(scannedCharacter) == 2){
-			switch(scannedCharacter[0]){
+	char scannedLine[STR_CAP];
+	while(fgets(scannedLine, STR_CAP, userFilePTR) != NULL){
+		if(stringLength(scannedLine) == 2){
+			switch(scannedLine[0]){
 				case 'A':
 					adjectiveInput(adjectives, adjectiveIndex);
 					break;
@@ -94,25 +95,25 @@ void adjectiveInput(char adjectives[][STR_CAP], int* adjectiveIndex){
 
 
 void printWords(FILE* userFilePTR, char nouns[][STR_CAP], int* nounIndex, char verbs[NUM_VERBS][STR_CAP], int* verbIndex, char adjectives[NUM_ADJECTIVES][STR_CAP], int* adjectiveIndex){
-	char scannedCharacter[STR_CAP];
+	char scannedLine[STR_CAP];
 	int size = 0;
-	while(fgets(scannedCharacter, STR_CAP, userFilePTR) != NULL){
-		if(stringLength(scannedCharacter) == 2 ){
-			if(scannedCharacter[0] == 'A'){
-				printf("%s", adjectives[*adjectiveIndex]);
-				(*adjectiveIndex)++;
-			} else if(scannedCharacter[0] == 'N'){
+	while(fgets(scannedLine, STR_CAP, userFilePTR) != NULL){
+		if(stringLength(scannedLine) == 2){
+			if(scannedLine[0] == 'A'){
+				printf(" %s", adjectives[*adjectiveIndex]);
+				(*adjectiveIndex)++;		
+			} else if(scannedLine[0] == 'N'){
 				printf("%s" , nouns[*nounIndex]);
 				(*nounIndex)++;
-			} else if(scannedCharacter[0] == 'V'){
+			} else if(scannedLine[0] == 'V'){
 				printf("%s", verbs[*verbIndex]);
 				(*verbIndex)++;
 			}
 		}
 		else{
-		 	size = stringLength(scannedCharacter);
-		 	scannedCharacter[size - 1] = '\0';
-			printf("%s", scannedCharacter);
+		 	size = stringLength(scannedLine);
+		 	scannedLine[size - 1] = '\0';
+		 	printf("%s", scannedLine);
 		}
 		
 		
@@ -130,4 +131,11 @@ int stringLength(char str[]){
 	return length;
 }
 
+void stringCopy(char source[], char dest[]){
+	int i;
+	for(i = 0; source[i] != '\0'; i++){
+		dest[i] = source[i];
+	}
+	dest[i] = '\0';
+}
 
