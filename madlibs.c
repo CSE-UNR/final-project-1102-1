@@ -12,8 +12,9 @@
 #define LINE_CAP 100
 
 //Reading files and printing result functions
-void scanFile(FILE* userFilePTR, char scannedFile[][STR_CAP], int* numLinesPTR, char nouns[][STR_CAP], int* nounIndex, char verbs[NUM_VERBS][STR_CAP], int* verbIndex, char adjectives[NUM_ADJECTIVES][STR_CAP], int* adjectiveIndex);
+void scanFile(FILE* userFilePTR, char scannedFile[][STR_CAP], int* numLinesPTR);
 void printWords(FILE* userFilePTR, char scannedFile[][STR_CAP], int numLines, char nouns[][STR_CAP], int* nounIndex, char verbs[NUM_VERBS][STR_CAP], int* verbIndex, char adjectives[NUM_ADJECTIVES][STR_CAP], int* adjectiveIndex);
+void scanPlaceholders(FILE* userFilePTR, char scannedFile[][STR_CAP], int* numLinesPTR, char nouns[][STR_CAP], int* nounIndex, char verbs[NUM_VERBS][STR_CAP], int* verbIndex, char adjectives[NUM_ADJECTIVES][STR_CAP], int* adjectiveIndex);
 
 //Placeholder reader functions
 void nounInput(char nouns[][STR_CAP], int* nounIndex);
@@ -43,20 +44,13 @@ int main(){
 	}
 	
 	//Scanning file for placeholders
-	scanFile(userFilePTR, scannedFile, &numLines, nouns, &nounIndex, verbs, &verbIndex, adjectives, &adjectiveIndex);
+	scanFile(userFilePTR, scannedFile, &numLines);
+	scanPlaceholders(userFilePTR, scannedFile, &numLines, nouns, &nounIndex, verbs, &verbIndex, adjectives, &adjectiveIndex);
 	
 	//Reset indexs for placeholders
 	nounIndex = 0;
 	verbIndex = 0;
 	adjectiveIndex = 0;
-	 
-	//Reset cursor for file
-	fclose(userFilePTR);
-	userFilePTR = fopen(userFile, "r");
-	if(userFilePTR == NULL){
-		printf("Could not open %s again, please try again.\n", userFile);
-		return 0;
-	}
 	
 	//Print final results
 	printWords(userFilePTR, scannedFile, numLines, nouns, &nounIndex, verbs, &verbIndex, adjectives, &adjectiveIndex);
@@ -65,28 +59,32 @@ int main(){
 	return 0;
 }
 
-void scanFile(FILE* userFilePTR, char scannedFile[][STR_CAP], int* numLinesPTR, char nouns[][STR_CAP], int* nounIndex, char verbs[NUM_VERBS][STR_CAP], int* verbIndex, char adjectives[NUM_ADJECTIVES][STR_CAP], int* adjectiveIndex){
+void scanFile(FILE* userFilePTR, char scannedFile[][STR_CAP], int* numLinesPTR){
 	char scannedLine[STR_CAP];
 	while(fgets(scannedLine, STR_CAP, userFilePTR) != NULL){
-		if(stringLength(scannedLine) == 2){ //Check if line length is 2, i.e. "V\n"
-			switch(scannedLine[0]){ //Check the first character of line and run the corresponding function
-				case 'A':
-					adjectiveInput(adjectives, adjectiveIndex);
-					break;
-				case 'N':
-					nounInput(nouns, nounIndex);
-					break;
-				case 'V':
-					verbInput(verbs, verbIndex);
-					break;	
-			}
-		}
-		
 		//Copy current string into an array of strings for the file
 		stringCopy(scannedLine, scannedFile[*numLinesPTR]);
 		(*numLinesPTR)++;
 	}
 }
+
+void scanPlaceholders(FILE* userFilePTR, char scannedFile[][STR_CAP], int* numLinesPTR, char nouns[][STR_CAP], int* nounIndex, char verbs[NUM_VERBS][STR_CAP], int* verbIndex, char adjectives[NUM_ADJECTIVES][STR_CAP], int* adjectiveIndex){
+	char tempLine[STR_CAP];
+	for(int i = 0; i < *numLinesPTR; i++){
+		stringCopy(scannedFile[i], tempLine); //Copy current line of string into a 1D array
+		if(stringLength(tempLine) == 2){ //Check if the array length size is 2, i.e. "A\n"
+			if(tempLine[0] == 'A'){ //Check for first index of array for placeholder and run corresponding function
+				adjectiveInput(adjectives, adjectiveIndex);
+			} else if(tempLine[0] == 'N'){
+				nounInput(nouns, nounIndex);
+			} else if(tempLine[0] == 'V'){
+				verbInput(verbs, verbIndex);
+			}
+			
+		} 	
+	}
+}
+
 
 void nounInput(char nouns[][STR_CAP], int* nounIndex){
 	printf("Please enter a noun: ");
@@ -126,7 +124,6 @@ void printWords(FILE* userFilePTR, char scannedFile[][STR_CAP], int numLines, ch
 				}
 			} else if(scannedLine[0] == 'N'){
 				if(scannedFile[i + 1][0] == '.' || scannedFile[i + 1][0] == '!' || scannedFile[i + 1][0] == ','){ //Check the next line, if it begins with a punctuation print corresponding spacing.
-					printf(" %s", adjectives[*adjectiveIndex]);
 					printf(" %s" , nouns[*nounIndex]);
 					(*nounIndex)++;
 				} else {
@@ -135,7 +132,6 @@ void printWords(FILE* userFilePTR, char scannedFile[][STR_CAP], int numLines, ch
 				}
 			} else if(scannedLine[0] == 'V'){
 				if(scannedFile[i + 1][0] == '.' || scannedFile[i + 1][0] == '!' || scannedFile[i + 1][0] == ','){ //Check the next line, if it begins with a punctuation print corresponding spacing.
-					printf(" %s", adjectives[*adjectiveIndex]);
 					printf(" %s", verbs[*verbIndex]);
 					(*verbIndex)++;
 				} else {
