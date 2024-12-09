@@ -25,16 +25,19 @@ void adjectiveInput(char adjectives[][STR_CAP], int* adjectiveIndex);
 int stringLength(char str[]);
 void stringCopy(char[], char[]);
 
-int main(){
+int main(int argc, char* argv[]){
 	char userFile[USERFILESIZE];
 	char nouns[NUM_NOUNS][STR_CAP], verbs[NUM_VERBS][STR_CAP], adjectives[NUM_ADJECTIVES][STR_CAP];
 	int nounIndex = 0, verbIndex = 0, adjectiveIndex = 0, numLines = 0;
 	char scannedFile[LINE_CAP][STR_CAP];
 	
-	//Prompt user for madlibs file
-	printf("Please enter desired madlibs file (madlib1.txt, madlib2.txt): ");
-	fgets(userFile, USERFILESIZE, stdin);
-	userFile[stringLength(userFile) - 1] = '\0';
+	//Checking for only two arguments, i.e. "./madlibs" and "<filename>"
+	if(argc != 2){
+		printf("You have entered an invalid amount of arguments, please try again.\n");
+		printf("Usage: ./madlibs <filename>\n");
+		return 0;
+	}
+	stringCopy(argv[1], userFile); //Copy the second index of the argument vector, "<filename>" into userFile string
 	
 	//Opening and checking if process was successful
 	FILE* userFilePTR = fopen(userFile, "r");
